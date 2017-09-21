@@ -9,7 +9,7 @@ double sumOfArea(const std::vector<Shape *> & shapes) {
     for (Shape *shapePoint: shapes)
         total += shapePoint->area();
 
-    return total;
+    return total; 
 
 }
 

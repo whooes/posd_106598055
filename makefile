@@ -1,10 +1,10 @@
 all: hw2
 
-hw2: mainTerm.o
-	g++ -o hw2 mainTerm.o -lgtest -lpthread
+hw2: main.o
+	g++ -o hw2 main.o -lgtest -lpthread
 
-mainTerm.o: mainTerm.cpp number.h utTerm.h term.h atom.h variable.h
-	g++ -std=c++11 -c mainTerm.cpp
+main.o: main.cpp number.h utTerm.h term.h atom.h variable.h
+	g++ -std=c++11 -c main.cpp
 
 
 
@@ -31,6 +31,8 @@ mainTerm.o: mainTerm.cpp number.h utTerm.h term.h atom.h variable.h
 #list.o: list.h list.cpp term.h var.h
 #	g++ -std=c++11 -c list.cpp
 clean:
-	rm -f *.o madRace utAtom
-stat:
-	wc *.h *.cpp
+ifeq (${OS}, Windows_NT)
+	del *.o *.exe
+else
+	rm -f *.o hw2
+endif

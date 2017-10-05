@@ -1,7 +1,7 @@
 #ifndef UTTERM_H
 #define UTTERM_H
 
-//#include <gtest/gtest.h>
+#include <gtest/gtest.h>
 #include "term.h"
 #include "number.h"
 #include "atom.h"

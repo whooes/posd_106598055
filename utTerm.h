@@ -1,6 +1,7 @@
 #ifndef UTTERM_H
 #define UTTERM_H
 
+#include <gtest/gtest.h>
 #include "term.h"
 #include "number.h"
 #include "atom.h"
@@ -78,7 +79,7 @@ TEST (Atom, matchSuccessToVarInstantedToDiffConstant) {
 //  cout << tom.symbol() << endl;
 
   EXPECT_TRUE(X.match(tom));
-//  cout << tom.symbol() << endl;
+
 
   EXPECT_TRUE(tom.match(X));
   EXPECT_EQ("tom" ,X.symbol());
@@ -94,7 +95,7 @@ TEST (Atom, matchFailureToVarInstantedToDiffConstant) {
   Atom jerry("jerry");
   Atom tom("tom");
   EXPECT_TRUE(X.match(jerry));
-  //cout << tom.symbol() << endl;
+
   EXPECT_FALSE(tom.match(X));
   //cout << tom.symbol() << endl;
 

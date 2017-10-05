@@ -9,6 +9,7 @@ using std::string;
 class Atom :public Term{
 
   public:
+
     Atom(string s):Term(s){}
     bool variable(){
       return false;

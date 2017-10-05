@@ -1,13 +1,13 @@
 #ifndef UTTERM_H
 #define UTTERM_H
 
-#include <gtest/gtest.h>
+
 #include "term.h"
 #include "number.h"
 #include "atom.h"
 #include "variable.h"
-#include <iostream>
-using namespace std;
+
+
 
 //test Number.value()
 TEST (Number,ctor) {
@@ -64,7 +64,7 @@ TEST (Atom, matchFailureDiffConstant) {
 TEST (Atom, matchSuccessToVar) {
   Atom tom("tom");
   Variable X("X");
-//cout << X.symbol() << endl;
+
   EXPECT_TRUE(tom.match(X));
   EXPECT_EQ("tom" ,X.symbol());
 //cout << tom.symbol() << endl;

@@ -1,7 +1,7 @@
 #ifndef UTTERM_H
 #define UTTERM_H
 
-#include <gtest/gtest.h>
+//#include <gtest/gtest.h>
 #include "term.h"
 #include "number.h"
 #include "atom.h"
@@ -103,7 +103,7 @@ TEST (Atom, matchFailureToVarInstantedToDiffConstant) {
 
 // ?- X = 5.
 // X = 5.
-TEST (Var, matchSuccessToNumber) {
+TEST (Variable, matchSuccessToNumber) {
   Variable X("X");
   Number number(5);
   EXPECT_TRUE(X.match(number));
@@ -111,7 +111,7 @@ TEST (Var, matchSuccessToNumber) {
 
 // ?- X=25, X= 100.
 // false.
-TEST (Var, matchFailureToTwoDiffNumbers) {
+TEST (Variable, matchFailureToTwoDiffNumbers) {
   Variable X("X");
   Number number1(25);
   Number number2(100);
@@ -121,7 +121,7 @@ TEST (Var, matchFailureToTwoDiffNumbers) {
 }
 // ?- X=tom, X= 25.
 // false.
-TEST (Var, matchSuccessToAtomThenFailureToNumber) {
+TEST (Variable, matchSuccessToAtomThenFailureToNumber) {
   Variable X("X");
   Atom tom("tom");
   Number number(25);
@@ -131,7 +131,7 @@ TEST (Var, matchSuccessToAtomThenFailureToNumber) {
 }
 //?- tom=X, 25=X.
 //false.
-TEST (Var, matchSuccessToAtomThenFailureToNumber2) {
+TEST (Variable, matchSuccessToAtomThenFailureToNumber2) {
   Atom tom("tom");
   Variable X("X");
   Number number(25);
@@ -140,7 +140,7 @@ TEST (Var, matchSuccessToAtomThenFailureToNumber2) {
 }
 //?- X=tom, X=tom.
 //true.
-TEST(Var, reAssignTheSameAtom){
+TEST(Variable, reAssignTheSameAtom){
   Variable X("X");
   Atom tom("tom");
   EXPECT_TRUE(tom.match(X));

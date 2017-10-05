@@ -11,7 +11,7 @@ class Term{
       return _symbol;
     }
 
-    virtual bool variable(){
+    virtual bool var(){
 
     }
 

@@ -18,7 +18,7 @@ class Variable : public Term{
     string value(){
       return _assignValue;
     }
-    bool variable(){
+    bool var(){
       return true;
     }
     bool match(Term &t){

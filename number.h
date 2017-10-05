@@ -16,13 +16,13 @@ class Number : public Term{
     string value(){
       return symbol();
     }
-    bool variable(){
+    bool var(){
       return false;
     }
 
 
     bool match(Term &t){
-      if(t.variable()){
+      if(t.var()){
         return t.match(*this);
       }
       return symbol() == t.symbol();

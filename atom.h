@@ -3,24 +3,31 @@
 
 #include <string>
 #include "term.h"
+#include "variable.h"
+
 using std::string;
 
 
-class Atom :public Term{
+class Atom : public Term{
 
   public:
 
-    Atom(string s):Term(s){}
-    bool var(){
-      return false;
+    Atom(string s):_symbol(s) {}
+
+    bool match(Term &term){
+      return value() == term.value();
     }
-    bool match(Term &t){
-      if(t.var()){
-        return t.match(*this);
-      }
-      return symbol() == t.symbol();
+
+    bool match(Variable &var){
+      return var.match(*this);
     }
+
+    string symbol() const{
+      return _symbol;
+    }
+
   private:
+    string _symbol;
 };
 
 

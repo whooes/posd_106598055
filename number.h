@@ -4,6 +4,8 @@
 #include<string>
 #include "term.h"
 #include <iostream>
+#include <sstream>
+#include "variable.h"
 
 using std::string;
 using std::to_string;
@@ -12,24 +14,16 @@ class Number : public Term{
 
   public:
 
-  Number(int s) : Term(to_string(s)),_number(s){}
-    string value(){
-      return symbol();
-    }
-    bool var(){
-      return false;
-    }
+    Number(double n);
 
+    string symbol() const;
 
-    bool match(Term &t){
-      if(t.var()){
-        return t.match(*this);
-      }
-      return symbol() == t.symbol();
-  }
+    bool match(Term &term);
 
-private:
-    int _number;
+    bool match(Variable &var);
+
+    private:
+      string _symbol;
 };
 
 

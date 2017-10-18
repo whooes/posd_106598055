@@ -5,22 +5,15 @@
 using std::string;
 
 class Term{
+
   public:
-    Term(string s):_symbol(s){}
-    string symbol(){
-      return _symbol;
+    virtual string symbol() const= 0;
+
+    virtual string value() const{
+      return symbol();
     }
 
-    virtual bool var(){
-
-    }
-
-    virtual bool match(Term &t){
-
-    };
-  private:
-    string _symbol;
+    virtual bool match(Term &term) = 0;
 };
-
 
 #endif

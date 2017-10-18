@@ -3,39 +3,27 @@
 
 #include <string>
 #include "term.h"
+#include <vector>
 
 using std::string;
 using std::to_string;
+using std::vector;
 
 class Variable : public Term{
 
   public:
-    Variable(string s):Term(s),_assignValue(s){}
+    Variable(string s);
 
-    string symbol(){
-    return  _assignValue;
-    }
-    string value(){
-      return _assignValue;
-    }
-    bool var(){
-      return true;
-    }
-    bool match(Term &t){
-      if(_assignable){
-        _assignValue = t.symbol();
-        _assignable = false;
-        return true;
-      }else{
-        if(_assignValue == t.symbol())
-          return true;
-        else
-          return false;
-        }
-    }
+    string symbol() const;
+
+    string value() const;
+
+    bool match(Term &term);
+
 
   private:
     bool _assignable = true;
-    string _assignValue;
+    string _symbol;
+    Term *_value = NULL;
 };
 #endif

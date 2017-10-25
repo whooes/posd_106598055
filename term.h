@@ -14,6 +14,10 @@ class Term{
     }
 
     virtual bool match(Term &term) = 0;
+
+    /*virtual bool isList(){
+      return false;
+    }*/
 };
 
 #endif

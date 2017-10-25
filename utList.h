@@ -157,10 +157,11 @@ TEST(List, matchToVarToAtominListShouldSucceed) {
 TEST(List, matchVarinListToAtomShouldSucceed) {
   Variable Y("Y");
   Variable X("X");
+  Number num(496);
   Atom terence_tao("terence_tao");
   Atom alan_mathison_turing("alan_mathison_turing");
   X.match(alan_mathison_turing);
-  std::vector<Term*> v ={&Y , &X, &terence_tao};
+  std::vector<Term*> v ={&num , &X, &terence_tao};
   List l(v);
   Y.match(l);
   EXPECT_EQ("[496, alan_mathison_turing, terence_tao]",Y.value());
@@ -194,11 +195,13 @@ TEST(List, headAndTailMatching2) {
 // ?- [[first], second, third] = [H|T].
 // H = [first], T = [second, third].
 TEST(List, headAndTailMatching3) {
-  Atom f("[first]"), s("second"), t("third");
-  vector<Term *> args = {&f, &s ,&t};
-  List l(args);
-  EXPECT_EQ(string("[first]"), l.tail()->head()->value());
-  EXPECT_EQ(string("[second, third]"), l.tail()->tail()->value());
+  Atom f("first"), s("second"), t("third");
+  vector<Term *> args1 = {&f};
+  List l(args1);
+  vector<Term *> args2 = {&l, &s, &t};
+  List M(args2);
+  EXPECT_EQ(string("[first]"), M.head()->value());
+  EXPECT_EQ(string("[second, third]"), M.tail()->value());
 
 }
 

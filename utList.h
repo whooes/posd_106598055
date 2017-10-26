@@ -97,6 +97,7 @@ TEST(List, matchToVarShouldSucceed) {
   std::vector<Term *> v ={ &num, &X, &terence_tao};
   List l(v);
   EXPECT_TRUE(Y.match(l));
+  EXPECT_TRUE(l.match(Y));
 
   //std::cout << Y.value() << std::endl;
 }

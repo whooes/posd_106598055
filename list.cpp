@@ -50,8 +50,9 @@ string List::value() const{
 }
 
 bool List::match(Term &term){
-  List *X = dynamic_cast<List * >(&term);
+  List *X = dynamic_cast<List *>(&term);
   if(X){
+
     if(_elements.size() != X ->_elements.size())
       return false;
       for(unsigned int i = 0 ;i < _elements.size(); i++)
@@ -59,7 +60,9 @@ bool List::match(Term &term){
         if(!(_elements[i]-> match(*(X->_elements[i]))))
         return false;
       }
-      return true;
+
+      return value() == term.value();
   }
-  return value() == term.value();
+  return true;
+
 }

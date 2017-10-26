@@ -94,7 +94,7 @@ TEST(List, matchToVarShouldSucceed) {
   Number num(496);
   Variable X("X");
   Atom terence_tao("terence_tao");
-  std::vector<Term*> v ={ &num, &num, &X};
+  std::vector<Term*> v ={ &num, &X, &terence_tao};
   List l(v);
   EXPECT_TRUE(Y.match(l));
 }
@@ -107,7 +107,7 @@ TEST(List, matchToVarOccuredInListShouldFail) {
   Atom terence_tao("terence_tao");
   std::vector<Term*> v = { &num, &X, &terence_tao};
   List l(v);
-  EXPECT_TRUE(X.match(l));
+  EXPECT_FALSE(!X.match(l));
 }
 
 // ?- [496, X, terence_tao] = [496, X, terence_tao].

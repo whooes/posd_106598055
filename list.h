@@ -12,11 +12,12 @@ public:
   string value() const;
   bool match(Term &term);
 
-public:
   List ();
   List (vector<Term *> const & elements);
   Term * head() const;
   List * tail() const;
+
+  List *getList(){return this;}
 
 private:
   vector<Term *> _elements;

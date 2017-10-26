@@ -25,6 +25,8 @@ class Struct : public Term{
 
     string value() const ;
 
+    Struct *getStruct() {return this;}
+
   private:
     Atom _name;
     std::vector<Term *> _args;

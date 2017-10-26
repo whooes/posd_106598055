@@ -20,6 +20,7 @@ class Variable : public Term{
 
     bool match(Term &term);
 
+    Variable *getVar(){return this;}
 
   private:
     bool _assignable = true;

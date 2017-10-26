@@ -3,6 +3,9 @@
 #include <string>
 
 using std::string;
+class Struct;
+class List;
+class Variable;
 
 class Term{
 
@@ -15,7 +18,11 @@ class Term{
 
     virtual bool match(Term &term) = 0;
 
+    virtual Variable *getVar(){return NULL;}
 
+    virtual Struct *getStruct(){return NULL;}
+
+    virtual List *getList(){return NULL;}
 };
 
 #endif

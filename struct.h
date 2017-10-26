@@ -9,7 +9,7 @@
 
 
 using std::string;
-
+using std::to_string;
 
 class Struct : public Term{
   public:

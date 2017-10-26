@@ -1,6 +1,5 @@
 #ifndef TERM_H
 #define TERM_H
-
 #include <string>
 
 using std::string;
@@ -16,7 +15,7 @@ class Term{
 
     virtual bool match(Term &term) = 0;
 
-    
+
 };
 
 #endif

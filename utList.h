@@ -94,10 +94,10 @@ TEST(List, matchToVarShouldSucceed) {
   Number num(496);
   Variable X("X");
   Atom terence_tao("terence_tao");
-  std::vector<Term*> v ={ &num, &X, &terence_tao};
+  std::vector<Term *> v ={ &num, &X, &terence_tao};
   List l(v);
   EXPECT_TRUE(Y.match(l));
-  EXPECT_EQ("[496, X, terence_tao]",Y.value());
+
   //std::cout << Y.value() << std::endl;
 }
 

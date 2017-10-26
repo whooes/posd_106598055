@@ -107,7 +107,7 @@ TEST(List, matchToVarOccuredInListShouldFail) {
   Atom terence_tao("terence_tao");
   std::vector<Term*> v = { &num, &X, &terence_tao};
   List l(v);
-  EXPECT_FALSE(!X.match(l));
+  EXPECT_TRUE(X.match(l));
 }
 
 // ?- [496, X, terence_tao] = [496, X, terence_tao].

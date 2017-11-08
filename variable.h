@@ -1,30 +1,30 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
-#include <string>
 #include "term.h"
 #include <vector>
+#include <string>
 
 using std::string;
-using std::to_string;
 using std::vector;
 
-class Variable : public Term{
+class Variable : public Term {
+public:
+  Variable(string s);
 
-  public:
-    Variable(string s);
+  string symbol() const;
 
-    string symbol() const;
+  string value() const;
 
-    string value() const;
+  bool match(Term &term);
 
-    bool match(Term &term);
+  Variable *getVariable();
 
-    Variable *getVar(){return this;}
-
-  private:
-    bool _assignable = true;
-    string _symbol;
-    Term *_value = NULL;
+private:
+  string _symbol;
+  bool _assignable = true;
+  Term *_value = NULL;
+  int _vectorPointer = -1;
 };
+
 #endif

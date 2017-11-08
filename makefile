@@ -1,6 +1,6 @@
 INC_DIR = include
 
-Name = hw4
+Name = hw5
 
 all: $(Name)
 
@@ -12,7 +12,7 @@ else
 	g++ -o $(Name) main.o struct.o variable.o number.o list.o -lgtest -lpthread
 endif
 
-main.o: main.cpp term.h atom.h utList.h
+main.o: main.cpp term.h atom.h parser.h scanner.h global.h utParser.h
 	g++ -std=gnu++0x -c main.cpp
 struct.o:struct.h struct.cpp
 	g++ -std=gnu++0x -c struct.cpp

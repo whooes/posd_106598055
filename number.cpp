@@ -1,7 +1,5 @@
 #include "number.h"
 
-
-
 Number::Number(double n) {
   std::stringstream ss;
     ss << n;
@@ -9,17 +7,14 @@ Number::Number(double n) {
 
 }
 
-
   string Number::symbol() const {
     return _symbol;
 }
 
-
   bool Number::match(Term &term){
+    if (term.getVar()) {
+      return term.match(*this);
+    } else {
       return value() == term.value();
     }
-
-
-  bool Number::match(Variable &var){
-    return var.match(*this);
   }

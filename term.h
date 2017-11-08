@@ -23,6 +23,8 @@ class Term{
     virtual Struct *getStruct(){return NULL;}
 
     virtual List *getList(){return NULL;}
+
+
 };
 
 #endif

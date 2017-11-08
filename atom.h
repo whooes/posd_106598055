@@ -15,12 +15,15 @@ class Atom : public Term{
     Atom(string s):_symbol(s) {}
 
     bool match(Term &term){
+      if (term.getVar()) {
+        return term.match(*this);
+      }
+      else
+      {
       return value() == term.value();
+      }
     }
 
-    bool match(Variable &var){
-      return var.match(*this);
-    }
 
     string symbol() const{
       return _symbol;

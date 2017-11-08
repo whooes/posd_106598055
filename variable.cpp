@@ -24,3 +24,5 @@ bool Variable::match(Term &term){
   else
     return _value ->match(term);
 }
+
+Variable *Variable::getVariable(){ return this; }

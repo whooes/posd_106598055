@@ -1,6 +1,4 @@
-
 #include "struct.h"
-
 
 Struct::Struct(Atom const & name , std::vector<Term *> args):_name(name), _args(args){}
 
@@ -14,10 +12,17 @@ Atom const & Struct::name(){
 
 string Struct::symbol() const{
       string ret = _name.symbol()+"(";
-        for(int i = 0; i < _args.size() - 1 ; i++){
-          ret += _args[i] -> symbol() + ", ";
+        for(int i = 0; i < (int)_args.size(); i++){
+          if(i == (int)_args.size() - 1)
+          {
+            ret += _args[i] -> symbol();
+          }
+          else
+          {
+            ret += _args[i] -> symbol() + ", ";
+          }
         }
-      ret += _args[_args.size() - 1]-> symbol() + ")";
+      ret +=")";
       return ret;
     }
 
@@ -37,6 +42,7 @@ bool Struct::match(Term &term){
 
       return false;
     }
+    
 string Struct::value() const {
 
   string str = _name.symbol() + "(" ;
@@ -46,4 +52,13 @@ string Struct::value() const {
   }
   str += _args[_args.size()-1] -> value() + ")" ;
   return str;
+}
+
+bool Struct::match(Variable &var) { return var.match(*this); }
+
+int Struct::arity(){
+  return _args.size();
+}
+Struct *Struct::getStruct(){
+  return this;
 }

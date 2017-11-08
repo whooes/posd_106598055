@@ -1,6 +1,5 @@
 #include "list.h"
 
-
 List::List(): _elements() {}
 
 List::List(vector<Term *> const & elements):_elements(elements){}
@@ -18,52 +17,73 @@ List * List::tail() const{
   {
     throw string("Accessing tail in an empty list");
   }
-  std::vector<Term *> v;
-  for(unsigned int i = 1 ; i < _elements.size(); i++)
+  else
   {
-    v.push_back(_elements[i]);
+    List *t = new List(vector<Term *>(
+        _elements.end() - _elements.size() + 1, _elements.end()));
+    return t;
   }
-  List *X = new List(v);
-  return X;
 }
 
 string List::symbol() const{
-  string s = "";
-  if(_elements.empty())
-    return "[]";
-  for(unsigned int i = 0 ; i < _elements.size() - 1 ; i++)
+  string s = "[";
+
+  for(int i = 0; i<(int)_elements.size(); i++)
   {
-    s += (_elements[i] -> symbol() + ", ");
+    if(i == (int)_elements.size() -1)
+    {
+      s += _elements[i]->symbol();
+    }
+    else
+    {
+      s += _elements[i]->symbol() + ", ";
+    }
   }
-  return "[" + s + _elements[_elements.size() - 1 ]-> symbol() + "]" ;
+  return s + "]";
 }
 
 string List::value() const{
-  string s = "";
-  if(_elements.empty())
-    return "[]";
-    for(unsigned int i = 0 ; i < _elements.size() - 1 ; i++)
+  string s = "[";
+
+    for(int i = 0; i<(int)_elements.size(); i++)
     {
-      s += (_elements[i] -> value() + ", ");
+      if(i == (int)_elements.size() -1)
+      {
+        s += _elements[i]->symbol();
+      }
+      else
+      {
+        s += _elements[i]->symbol() + ", ";
+      }
     }
-    return "[" + s + _elements[_elements.size() - 1 ]-> value() + "]" ;
-}
+    return s + "]";
+  }
 
 bool List::match(Term &term){
-  List *X = dynamic_cast<List *>(&term);
-  if(term.getVar()){
-    return term.match(*this);
-  }
-  else if(X){
-    if(_elements.size() != X ->_elements.size())
-      return false;
-      for(unsigned int i = 0 ;i < _elements.size(); i++)
+  if (term.getVar())
+    {
+      return term.match(*this);
+    }
+    else if (List *X = term.getList())
+    {
+      if (_elements.size() != X->_elements.size())
       {
-        if(!(_elements[i]-> match(*(X->_elements[i]))))
         return false;
       }
-      return true;
+      else
+      {
+        for (int i = 0; i < _elements.size(); i++)
+        {
+          if (!_elements[i]->match(*(X->_elements[i])))
+            return false;
+        }
+        return true;
+      }
+    }
+    else
+    {
+      return false;
+    }
   }
-  return value() == term.value();
 
-}
+  List *List::getList(){return this;}

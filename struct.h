@@ -1,34 +1,36 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 
-
-#include<string>
-#include <vector>
-#include "term.h"
 #include "atom.h"
-
+#include <vector>
+#include <string>
 
 using std::string;
-using std::to_string;
 
-class Struct : public Term{
-  public:
-    Struct(Atom const & name , std::vector<Term *> args);
+class Struct : public Term
+{
+public:
+  Struct(Atom const &name, std::vector<Term *> args);
 
-    Term * args(int index);
+  int arity();
 
-    Atom const & name();
+  Term *args(int index);
 
-    string symbol() const;
+  Atom const &name();
 
-    bool match(Term & term);
+  string symbol() const;
 
-    string value() const ;
+  string value() const;
 
-    Struct *getStruct() {return this;}
+  bool match(Term &term);
 
-  private:
-    Atom _name;
-    std::vector<Term *> _args;
+  bool match(Variable &var);
+
+  Struct *getStruct();
+
+private:
+  Atom _name;
+  std::vector<Term *> _args;
 };
+
 #endif

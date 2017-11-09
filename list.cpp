@@ -49,11 +49,11 @@ string List::value() const{
     {
       if(i == (int)_elements.size() -1)
       {
-        s += _elements[i]->symbol();
+        s += _elements[i]->value();
       }
       else
       {
-        s += _elements[i]->symbol() + ", ";
+        s += _elements[i]->value() + ", ";
       }
     }
     return s + "]";

@@ -1,30 +1,24 @@
-INC_DIR = include
-
-Name = hw5
+Name = hw6
 
 all: $(Name)
 
-${Name}: main.o struct.o variable.o number.o list.o
+${Name} :	 main.o term.o
 
-ifeq (${OS}, Windows_NT)
-	g++ -o $(Name) main.o struct.o variable.o number.o list.o -lgtest
+ifeq	(${OS}, Windows_NT)
+	g++ -o $(Name) main.o term.o -lgtest
 else
-	g++ -o $(Name) main.o struct.o variable.o number.o list.o -lgtest -lpthread
+	g++ -o $(Name) main.o term.o -lgtest -lpthread
 endif
 
-main.o: main.cpp term.h atom.h parser.h scanner.h global.h utParser.h
+main.o: main.cpp term.h atom.h number.h utParser.h struct.h list.h global.h scanner.h parser.h node.h
 	g++ -std=gnu++0x -c main.cpp
-struct.o:struct.h struct.cpp
-	g++ -std=gnu++0x -c struct.cpp
-variable.o:variable.h variable.cpp
-	g++ -std=gnu++0x -c variable.cpp
-number.o:number.h number.cpp
-	g++ -std=gnu++0x -c number.cpp
-list.o:list.h list.cpp
-	g++ -std=gnu++0x -c list.cpp
+term.o: term.cpp term.h variable.h
+	g++ -std=gnu++0x -c term.cpp
+
 
 clean:
-ifeq (${OS}, Windows_NT)
+
+ifeq (${OS}, Window_NT)
 	del *.o *.exe
 else
 	rm -f *.o $(Name)

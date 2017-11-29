@@ -1,30 +1,34 @@
 #ifndef TERM_H
 #define TERM_H
-#include <string>
 
+#include <string>
+#include <sstream>
 using std::string;
-class Struct;
-class List;
-class Variable;
 
 class Term{
+public:
+  virtual string symbol() const
+  {
+    return _symbol;
+  }
+  virtual string value() const
+  {
+    return symbol();
+  }
+  virtual bool match(Term & term);
 
-  public:
-    virtual string symbol() const= 0;
+protected:
 
-    virtual string value() const{
-      return symbol();
-    }
+  Term ():_symbol(""){}
 
-    virtual bool match(Term &term) = 0;
-
-    virtual Variable *getVar(){return NULL;}
-
-    virtual Struct *getStruct(){return NULL;}
-
-    virtual List *getList(){return NULL;}
-
-
+  Term (string s):_symbol(s) {}
+  
+  Term(double db){
+    std::ostringstream strs;
+    strs << db;
+    _symbol = strs.str();
+  }
+  string _symbol;
 };
 
 #endif

@@ -3,20 +3,12 @@
 
 #include <sstream>
 #include "term.h"
-#include "variable.h"
 #include <string>
 using std::string;
 
-class Number : public Term {
+class Number : public Term{
 public:
-  Number(double n);
-
-  string symbol() const;
-
-  bool match(Term &term);
-
-private:
-  string _symbol;
+  Number(double db):Term(db) {}
 };
 
 #endif

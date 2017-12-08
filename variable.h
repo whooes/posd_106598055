@@ -1,30 +1,46 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
-#include <string>
 #include "term.h"
+#include <vector>
+#include <string>
+
 using std::string;
+using std::vector;
 
 class Variable : public Term {
 public:
-  Variable(string s):Term(s), _inst(0){}
-  string value() const {
-    if (_inst)
-      return _inst -> value();
-    else
-      return Term::value();
+  Variable(string s) : _symbol(s) {}
+
+  string symbol() const {
+    return _symbol;
   }
-  bool match(Term &term){
-    if (this == &term)
-      return true;
-    if(!_inst){
-      _inst = &term ;
+
+  string value() const {
+    if (_value)
+      return _value->value();
+    else
+      return symbol();
+  }
+
+  bool match(Term &term) {
+    if (&term == this) {
       return true;
     }
-    return _inst -> match(term);
+    if (!_value) {
+      _value = &term;
+      return true;
+    } else {
+      return _value->match(term);
+    }
   }
+
+  Variable *getVariable() { return this; }
+
 private:
-  Term *_inst ;
+  string _symbol;
+  Term *_value = NULL;
+
 };
 
 #endif

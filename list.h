@@ -1,95 +1,130 @@
 #ifndef LIST_H
 #define LIST_H
-#include <typeinfo>
+
 #include "term.h"
-#include "variable.h"
 #include <vector>
-#include <string>
+
 using std::vector;
+template <class T>
+class Iterator;
 
-class List : public Term {
-public:
-  List():_elements(){}
-  List (vector<Term *> const & elements):_elements(elements){}
+class List : public Term
+{
+  public:
+    List() : _elements() {}
 
-  string symbol() const{
-    string ret = "[";
-    if (_elements.size() == 0){
-      ret += "]";
-      return ret;
-    }
-    else {
-      for(int i = 0; i < _elements.size() - 1 ; i++){
-        ret += _elements[i] -> symbol() + ", ";
-      }
-      ret += _elements[_elements.size()-1] -> symbol() + "]";
-    }
-    return ret;
-  }
-  std::string value() const{
-    std::string ret = "[";
-    if (_elements.size() == 0){
-      ret += "]";
-      return ret;
-    }
-    else {
-      for(int i = 0; i < _elements.size() - 1; i++){
-          ret += _elements[i] -> value() + ", ";
-      }
-        ret += _elements[_elements.size()-1] -> value() + "]";
-      return ret;
-    }
-  }
-  bool match(Term & term){
-      List * pl = dynamic_cast<List *>(&term);
-      Variable * pv = dynamic_cast<Variable *>(&term);
-      if (pl){
-        std::vector<Term *> pl_temp = pl -> getElements();
-        if (_elements.size() != pl_temp.size())
-          return false;
-        for (int i = 0; i < _elements.size(); i++){
-          if (!(_elements[i] -> match(*pl_temp[i]))){
-              return false;
-          }
+    List(vector<Term *> const &elements) : _elements(elements) {}
+
+    string symbol() const
+    {
+        string ret = "[";
+        for (int i = 0; i < (int)_elements.size(); i++)
+        {
+            if (i == (int)_elements.size() - 1)
+            {
+                ret += _elements[i]->symbol();
+            }
+            else
+            {
+                ret += _elements[i]->symbol() + ", ";
+            }
         }
-        return true;
-      }
-      else if (pv){
-        return pv -> match(*this);
-      }
-      else{
-        return symbol() == term.symbol();
-      }
-  }
+        return ret + "]";
+    }
 
-  Term * head() const{
-      Term * ret = NULL;
-      if (_elements.size() <= 0)
-        throw std::string("Accessing head in an empty list");
-      else{
-        ret = _elements[0];
-        return ret;
-      }
-  }
+    string value() const
+    {
+        string ret = "[";
+        for (int i = 0; i < (int)_elements.size(); i++)
+        {
+            if (i == (int)_elements.size() - 1)
+            {
+                ret += _elements[i]->value();
+            }
+            else
+            {
+                ret += _elements[i]->value() + ", ";
+            }
+        }
+        return ret + "]";
+    }
 
-  List * tail() const{
+    bool match(Term &term)
+    {
+        if (term.getVariable())
+        {
+            return term.match(*this);
+        }
+        else if (List *pl = term.getList())
+        {
+            if (_elements.size() != pl->_elements.size())
+            {
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < _elements.size(); i++)
+                {
+                    if (!_elements[i]->match(*(pl->_elements[i])))
+                        return false;
+                }
+                return true;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-      std::vector<Term *> temp = {};
-      temp = _elements;
-      if (temp.size() == 0)
-        throw std::string("Accessing tail in an empty list");
-      else{
-        temp.erase(temp.begin());
-        return new List(temp);
-      }
-  }
+    Term *head() const
+    {
+        if (_elements.empty())
+        {
+            throw string("Accessing head in an empty list");
+        }
+        else
+        {
+            return _elements[0];
+        }
+    }
 
-  vector<Term *> getElements(){
-    return _elements;
-  }
+    List *tail() const
+    {
+        if (_elements.empty())
+        {
+            throw string("Accessing tail in an empty list");
+        }
+        else
+        {
+            List *tempList = new List(vector<Term *>(
+                _elements.end() - _elements.size() + 1, _elements.end()));
+            return tempList;
+        }
+    }
 
-private:
-  vector<Term *> _elements;
+    int arity() {
+      return _elements.size();
+    }
+
+    Term *args(int index) {
+      return _elements[index];
+    }
+
+    List *getList() {
+      return this;
+    }
+
+    vector<Term *> elements() const {
+      return _elements;
+    }
+
+    Iterator<Term *> *createIterator();
+    Iterator<Term *> *createDFSIterator();
+    Iterator<Term *> *createBFSIterator();
+
+  private:
+    vector<Term *> _elements;
 };
 
 #endif

@@ -1,12 +1,15 @@
 #include "term.h"
-#include "variable.h"
-#include <iostream>
-#include <typeinfo>
+#include "iterator.h"
 
-bool Term::match(Term & term){
-  if (typeid(term) == typeid(Variable))
-    return term.match(*this);
-  else{
-    return symbol() == term.symbol();
-  }
+Iterator<Term *> *Term::createIterator()
+{
+    return new NullIterator<Term *>(this);
+}
+Iterator<Term *> *Term::createBFSIterator()
+{
+    return new NullIterator<Term *>(this);
+}
+Iterator<Term *> *Term::createDFSIterator()
+{
+    return new NullIterator<Term *>(this);
 }

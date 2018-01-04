@@ -1,30 +1,34 @@
 #ifndef ATOM_H
 #define ATOM_H
 
+#include <string>
 #include "term.h"
 #include "variable.h"
-#include <string>
+
 using std::string;
 
-class Atom : public Term
-{
+
+class Atom : public Term{
+
   public:
-    Atom(string s) : _symbol(s) {}
 
-    string symbol() const { return _symbol; }
-    string _symbol;
+    Atom(string s):_symbol(s) {}
 
-    bool match(Term &term)
-    {
-        if (term.getVariable())
-        {
-            return term.match(*this);
-        }
-        else
-        {
-            return value() == term.value();
-        }
+    bool match(Term &term){
+      return value() == term.value();
     }
+
+    bool match(Variable &var){
+      return var.match(*this);
+    }
+
+    string symbol() const{
+      return _symbol;
+    }
+
+  private:
+    string _symbol;
 };
+
 
 #endif

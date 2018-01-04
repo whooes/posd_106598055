@@ -1,45 +1,27 @@
-Name = hw8
+INC_DIR = include
 
-SHELL_FILE = mainShell
 
-HW_FILE = mainTest
+all: hw3
 
-all: clean $(Name) shell
-
-hw8: $(HW_FILE).o term.o struct.o list.o node.o
-
-shell: $(SHELL_FILE).o term.o struct.o list.o node.o
-
+hw3: main.o struct.o variable.o number.o
 ifeq (${OS}, Windows_NT)
-	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest
+	g++ -o hw3 main.o struct.o variable.o number.o -lgtest
 else
-	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
+	g++ -o hw3 main.o struct.o variable.o number.o -lgtest -lpthread
 endif
 
-ifeq (${OS}, Windows_NT)
-	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest
-else
-	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
-endif
-
-$(HW_FILE).o: $(HW_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
-	g++ -std=c++11 -c $(HW_FILE).cpp
-
-$(SHELL_FILE).o: $(SHELL_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
-	g++ -std=c++11 -c $(SHELL_FILE).cpp
-
-term.o: term.cpp term.h iterator.h
-	g++ -std=c++11 -c term.cpp
-struct.o: struct.cpp struct.h iterator.h
-	g++ -std=c++11 -c struct.cpp
-list.o: list.cpp list.h term.h iterator.h
-	g++ -std=c++11 -c list.cpp
-node.o: node.cpp node.h term.h
-	g++ -std=c++11 -c node.cpp
+main.o: main.cpp  term.h atom.h variable.h  utStruct.h utVariable.h number.cpp  struct.cpp variable.cpp
+	g++ -std=gnu++0x -c main.cpp
+struct.o:struct.h struct.cpp
+	g++ -std=gnu++0x -c struct.cpp
+variable.o:variable.h variable.cpp
+	g++ -std=gnu++0x -c variable.cpp
+number.o:number.h number.cpp
+	g++ -std=gnu++0x -c number.cpp
 
 clean:
 ifeq (${OS}, Windows_NT)
 	del *.o *.exe
 else
-	rm -f *.o $(Name) shell
+	rm -f *.o hw3
 endif

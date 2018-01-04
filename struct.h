@@ -13,11 +13,13 @@ class Iterator;
 class Struct : public Term
 {
   public:
-    Struct(Atom const &name, std::vector<Term *> args): _name(name), _args(args) {}
+    Struct(Atom const &name, std::vector<Term *> args)
+        : _name(name), _args(args) {}
 
-    Atom &name() {
-      return _name;
-    }
+    int arity() { return _args.size(); }
+    Term *args(int index) { return _args[index]; }
+
+    Atom &name() { return _name; }
 
     string symbol() const
     {
@@ -74,22 +76,8 @@ class Struct : public Term
         return false;
     }
 
-    int arity() {
-      return _args.size();
-    }
-
-    Term *args(int index) {
-      return _args[index];
-    }
-
-    bool match(Variable &var) {
-      return var.match(*this);
-    }
-
-    Struct *getStruct() {
-      return this;
-    }
-    
+    bool match(Variable &var) { return var.match(*this); }
+    Struct *getStruct() { return this; }
     Iterator<Term *> *createIterator();
     Iterator<Term *> *createDFSIterator();
     Iterator<Term *> *createBFSIterator();

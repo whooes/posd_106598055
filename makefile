@@ -1,28 +1,45 @@
-Name = hw7
+Name = hw8
 
-all: $(Name)
+SHELL_FILE = mainShell
 
-${Name} :	 main.o term.o struct.o list.o
+HW_FILE = mainTest
 
-ifeq	(${OS}, Windows_NT)
-	g++ -o $(Name) main.o term.o struct.o list.o -lgtest
+all: clean $(Name) shell
+
+hw8: $(HW_FILE).o term.o struct.o list.o node.o
+
+shell: $(SHELL_FILE).o term.o struct.o list.o node.o
+
+ifeq (${OS}, Windows_NT)
+	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest
 else
-	g++ -o $(Name) main.o term.o struct.o list.o -lgtest -lpthread
+	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
 endif
 
-main.o: main.cpp term.h atom.h number.h utIterator.h global.h scanner.h parser.h node.h
-	g++ -std=gnu++0x -c main.cpp
-term.o: term.cpp term.h variable.h iterator.h
-	g++ -std=gnu++0x -c term.cpp
+ifeq (${OS}, Windows_NT)
+	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest
+else
+	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
+endif
+
+$(HW_FILE).o: $(HW_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
+	g++ -std=c++11 -c $(HW_FILE).cpp
+
+$(SHELL_FILE).o: $(SHELL_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
+	g++ -std=c++11 -c $(SHELL_FILE).cpp
+
+term.o: term.cpp term.h iterator.h
+	g++ -std=c++11 -c term.cpp
 struct.o: struct.cpp struct.h iterator.h
-	g++ -std=gnu++0x -c struct.cpp
-list.o: list.cpp list.h iterator.h
-	g++ -std=gnu++0x -c list.cpp
+	g++ -std=c++11 -c struct.cpp
+list.o: list.cpp list.h term.h iterator.h
+	g++ -std=c++11 -c list.cpp
+node.o: node.cpp node.h term.h
+	g++ -std=c++11 -c node.cpp
 
 clean:
-
-ifeq (${OS}, Window_NT)
+ifeq (${OS}, Windows_NT)
 	del *.o *.exe
 else
-	rm -f *.o $(Name)
+	rm -f *.o $(Name) shell
 endif

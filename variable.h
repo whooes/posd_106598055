@@ -12,9 +12,7 @@ class Variable : public Term {
 public:
   Variable(string s) : _symbol(s) {}
 
-  string symbol() const {
-    return _symbol;
-  }
+  string symbol() const { return _symbol; }
 
   string value() const {
     if (_value)
@@ -40,7 +38,6 @@ public:
 private:
   string _symbol;
   Term *_value = NULL;
-
 };
 
 #endif

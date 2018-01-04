@@ -11,10 +11,6 @@ class Iterator;
 class List : public Term
 {
   public:
-    List() : _elements() {}
-
-    List(vector<Term *> const &elements) : _elements(elements) {}
-
     string symbol() const
     {
         string ret = "[";
@@ -76,7 +72,16 @@ class List : public Term
             return false;
         }
     }
+    int arity() { return _elements.size(); }
+    Term *args(int index) { return _elements[index]; }
+    List *getList() { return this; }
+    Iterator<Term *> *createIterator();
+    Iterator<Term *> *createDFSIterator();
+    Iterator<Term *> *createBFSIterator();
 
+  public:
+    List() : _elements() {}
+    List(vector<Term *> const &elements) : _elements(elements) {}
     Term *head() const
     {
         if (_elements.empty())
@@ -103,25 +108,7 @@ class List : public Term
         }
     }
 
-    int arity() {
-      return _elements.size();
-    }
-
-    Term *args(int index) {
-      return _elements[index];
-    }
-
-    List *getList() {
-      return this;
-    }
-
-    vector<Term *> elements() const {
-      return _elements;
-    }
-
-    Iterator<Term *> *createIterator();
-    Iterator<Term *> *createDFSIterator();
-    Iterator<Term *> *createBFSIterator();
+    vector<Term *> elements() const { return _elements; }
 
   private:
     vector<Term *> _elements;

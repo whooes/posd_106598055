@@ -1,6 +1,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 #include <string>
+using std::string;
+#include <stack>
+using std::stack;
+
 #include "atom.h"
 #include "variable.h"
 #include "global.h"
@@ -8,228 +12,255 @@
 #include "struct.h"
 #include "list.h"
 #include "number.h"
-#include "utParser.h"
 #include "node.h"
-#include <typeinfo>
 
-using std::string;
-using namespace std;
 
-class Parser{
-public:
-  Parser(Scanner scanner) : _scanner(scanner), _terms(){}
+class Parser
+{
+  public:
+    Parser(Scanner scanner) : _scanner(scanner), _terms() {}
 
-  Term* createTerm(){
-    int token = _scanner.nextToken();
-    _currentToken = token;
-    if(token == VAR){
-      return new Variable(symtable[_scanner.tokenValue()].first);
-    }else if(token == NUMBER){
-      return new Number(_scanner.tokenValue());
-    }else if(token == ATOM || token == ATOMSC){
-      Atom* atom = new Atom(symtable[_scanner.tokenValue()].first);
-      if(_scanner.currentChar() == '(' ) {
-        return structure();
-      }
-      else
-        return atom;
+    Term *createTerm(){
+        int token = _scanner.nextToken();
+        _currentToken = token;
+        if(token == VAR){
+          return new Variable(symtable[_scanner.tokenValue()].first);
+        }
+        else if(token == NUMBER){
+          return new Number(_scanner.tokenValue());
+        }
+        else if (token == ATOM || token == ATOMSC)
+        {
+            Atom *atom = new Atom(symtable[_scanner.tokenValue()].first);
+            if(_scanner.currentChar() == '('){
+                return structure();
+            }
+            else
+              return atom;
+        }
+        else if (token == '['){
+          return list();
+        }
+        return nullptr;
     }
-    else if(token == '['){
-      return list();
-    }
-    return nullptr;
-  }
 
-
-  Term * structure() {
-    _inStruct = true;
-    Atom structName = Atom(symtable[_scanner.tokenValue()].first);
-    int startIndexOfStructArgs = _terms.size();
-    _scanner.nextToken();
-    _isStruct = true;
-    createTerms();
-    if(_currentToken == ')')
+    Term *structure()
     {
-      _inStruct = false;
-      vector<Term *> args(_terms.begin() + startIndexOfStructArgs, _terms.end());
-      _terms.erase(_terms.begin() + startIndexOfStructArgs, _terms.end());
-      _nodeTerms.erase(_nodeTerms.begin() + startIndexOfStructArgs, _nodeTerms.end());
-      checkVar(args);
-      return new Struct(structName, args);
-    } else {
-      throw string("unexpected token");
+        Atom structName = Atom(symtable[_scanner.tokenValue()].first);
+        int startIndexOfStructArgs = _terms.size();
+        _scanner.nextToken();
+        createTerms();
+        if(_currentToken == ')'){
+            vector<Term *> args(_terms.begin() + startIndexOfStructArgs, _terms.end());
+            _terms.erase(_terms.begin() + startIndexOfStructArgs, _terms.end());
+            return new Struct(structName, args);
+        }
+        else{
+          throw string("Unbalanced operator");
+        }
     }
-  }
 
-  Term * list() {
-    int startIndexOfListArgs = _terms.size();
-    createTerms();
-    if(_currentToken == ']')
+    Term *list()
     {
-      vector<Term *> args(_terms.begin() + startIndexOfListArgs, _terms.end());
-      _terms.erase(_terms.begin() + startIndexOfListArgs, _terms.end());
-      _nodeTerms.erase(_nodeTerms.begin() + startIndexOfListArgs, _nodeTerms.end());
-      checkVar(args);
-      return new List(args);
-    } else {
-      throw string("unexpected token");
+        int startIndexOfListArgs = _terms.size();
+        createTerms();
+        if (_currentToken == ']'){
+          vector<Term *> args(_terms.begin() + startIndexOfListArgs, _terms.end());
+          _terms.erase(_terms.begin() + startIndexOfListArgs, _terms.end());
+          return new List(args);
+        }
+        else{
+          throw string("Unbalanced operator");
+        }
     }
-  }
 
-  vector<Term *> & getTerms() {
-    return _terms;
-  }
+    vector<Term *> &getTerms() { return _terms; }
 
-  void matchings() {
-    createTerms();
-    int commaCount = 0;
-    int commaPosition;
-    int semicolonCount = 0;
-    int semicolonPosition;
-    for (int i = 0; i < _nodeTreeOperator.size(); i++){
-      if (_nodeTreeOperator[i] -> payload == EQUALITY){
-        _nodeTreeOperator[i] -> left = _nodeTerms[i];
-        _nodeTreeOperator[i] -> right = _nodeTerms[i + 1];
-      }
-      else if (_nodeTreeOperator[i] -> payload == COMMA){
-        commaCount++;
-        if (commaCount == 1){
-          if (semicolonCount == 0){
-            _root = _nodeTreeOperator[i];
+    void matchings(){ _tree = buildExpressionTree(NULL); }
+
+    void buildExpression()
+    {
+        _tree = buildExpressionTree(NULL);
+        if(_tree->payload == TERM)
+          throw string(_tree->term->symbol() +" does never get assignment");
+
+        stack<Node *> NodeStack;
+        NodeStack.push(_tree);
+        while(!NodeStack.empty()){
+            Node *tempRoot = NodeStack.top();
+            NodeStack.pop();
+            if(tempRoot->payload != TERM){
+                if(!tempRoot->right || !tempRoot->left){
+                    throw string("Unexpected '" + tempRoot->operatorToString(tempRoot->payload) + "' before '.'");
+                }
+                if(tempRoot->payload == EQUALITY){
+                    if(tempRoot->left->payload != TERM)
+                       throw string(tempRoot->left->term->symbol() + " does never get assignment");
+                    if(tempRoot->right->payload != TERM)
+                       throw string(tempRoot->right->term->symbol() + " does never get assignment");
+                }
+            }
+        }
+    }
+
+    Node *buildExpressionTree(Node *root)
+    {
+        if (_scanner.currentChar() == '.')
+            return root;
+        if (_scanner.skipLeadingWhiteSpace() >=_scanner.buffer.length())
+            throw string("Missing token '.'");
+        Term *term = NULL;
+        Node *tempTree = NULL;
+        char currentChar = _scanner.currentChar();
+        if (!(currentChar == ';' || currentChar == ',' || currentChar == '=')){
+          term = createTerm();
+          _scanner.skipLeadingWhiteSpace();
+          currentChar = _scanner.currentChar();
+        }
+        if(currentChar == ';' || currentChar == ',' || currentChar == '=')
+        {
+          _scanner.extractChar();
+        }
+
+        if(currentChar == ';'){
+          _subTreeTerms.clear();
+          tempTree = new Node(SEMICOLON, nullptr, nullptr, nullptr);
+          if(root && SEMICOLON >= root->payload){
+            addNodeToSubTree(root, tempTree);
+            return buildExpressionTree(root);
           }
-          _nodeTreeOperator[i] -> left = _nodeTreeOperator[i - 1];
-          commaPosition = i;
+          else{
+            tempTree->left = root;
+            return buildExpressionTree(tempTree);
+          }
         }
-        else if (commaCount >= 2){
-          _nodeTreeOperator[commaPosition] -> right = _nodeTreeOperator[i];
-          _nodeTreeOperator[i] -> left = _nodeTreeOperator[i - 1];
-          commaPosition = i;
+        else if(currentChar == ',')
+        {
+          tempTree = new Node(COMMA, nullptr, nullptr, nullptr);
+          if (root && COMMA >= root->payload){
+            addNodeToSubTree(root, tempTree);
+            return buildExpressionTree(root);
+          }
+          else{
+            tempTree->left = root;
+            return buildExpressionTree(tempTree);
+          }
         }
-      }
-      else if (_nodeTreeOperator[i] -> payload == SEMICOLON){
-        semicolonCount++;
-        if (semicolonCount == 1){
-          _root = _nodeTreeOperator[i];
-          _nodeTreeOperator[i] -> left = _nodeTreeOperator[i - 1];
-          semicolonPosition = i;
+        else if(currentChar == '=')
+        {
+          term = checkTree(term);
+          Node *tempNode = new Node(TERM, checkTree(term), nullptr, nullptr);
+          _terms.push_back(term);
+          tempTree = new Node(EQUALITY, nullptr, tempNode, nullptr);
+          term = checkTree(createTerm());
+          tempTree->right = new Node(TERM, term, nullptr, nullptr);
+          _terms.push_back(term);
+          if(root){
+            addNodeToSubTree(root, tempTree);
+            return buildExpressionTree(root);
+          }
+          else{
+            return buildExpressionTree(tempTree);
+          }
         }
-        else if (semicolonCount >= 2){
-          _nodeTreeOperator[semicolonPosition] -> right = _nodeTreeOperator[i];
-          _nodeTreeOperator[i] -> left = _nodeTreeOperator[i - 1];
-          semicolonPosition = i;
+        else
+        {
+          term = checkTree(term);
+          Node *tempTree = new Node(TERM, checkTree(term), nullptr, nullptr);
+          _terms.push_back(term);
+          if(root){
+            addNodeToSubTree(root, tempTree);
+            return buildExpressionTree(root);
+          }
+          else{
+              return buildExpressionTree(tempTree);
+          }
         }
-      }
+        return NULL;
     }
-    if(commaCount > 0){
-    _nodeTreeOperator[commaPosition] -> right = _nodeTreeOperator[commaPosition + 1];
-    }
-    if(semicolonCount > 0){
-      if(commaCount == 0){
-        _nodeTreeOperator[semicolonCount] -> right = _nodeTreeOperator[semicolonPosition + 1];
+
+    void addNodeToSubTree(Node *root, Node *subTree)
+    {
+      Node *tempNode = root;
+      while (tempNode->right)
+      {
+        if(subTree->payload < tempNode->right->payload){
+          subTree->left = tempNode->right;
+          tempNode->right = subTree;
+          return;
+        }
+        tempNode = tempNode->right;
+      }
+      if(!tempNode->left){
+        tempNode->left = subTree;
       }
       else{
-        _nodeTreeOperator[semicolonPosition] -> right = _nodeTreeOperator[semicolonCount + 2];
+        tempNode->right = subTree;
       }
     }
-  }
-  Node * expressionTree(){
-    if (_nodeTreeOperator.size() == 1){
-      return _nodeTreeOperator[0];
-    }
-    return _root;
-  }
 
-  Operators getEnums(int op){
-    switch (op){
-      case ';':
-        return SEMICOLON;
-        break;
-      case ',':
-        return COMMA;
-        break;
-      case '=':
-        return EQUALITY;
-        break;
-      default:
-        return TERM;
-    }
-  }
-
-private:
-  FRIEND_TEST(ParserTest, createArgs);
-  FRIEND_TEST(ParserTest,ListOfTermsEmpty);
-  FRIEND_TEST(ParserTest,listofTermsTwoNumber);
-  FRIEND_TEST(ParserTest, createTerm_nestedStruct3);
-
-  void createTerms() {
-    Term* term = createTerm();
-    if(term!=nullptr)
+    Term *checkTree(Term *term)
     {
-      _nodeTerms.push_back(new Node(getEnums(_currentToken), term, nullptr, nullptr));
-      _terms.push_back(term);
-      if (_isStruct){
-        _structPosition.push_back(_terms.size() - 1);
-        _isStruct = false;
-      } 
-      if (isExist(term, _terms)){
-        _nodeTerms[_nodeTerms.size() - 1] = _nodeTerms[_symbolPosition];
-        _terms[_terms.size() - 1] = _terms[_symbolPosition];
-      }
-      while((_currentToken = _scanner.nextToken()) == ',' || _currentToken == '=' || _currentToken == ';') {
-        _treeOperator.push_back(_currentToken);
-        _nodeTreeOperator.push_back(new Node(getEnums(_currentToken)));
-        Term * _termInWhile = createTerm();
-        _nodeTerms.push_back(new Node(getEnums(_currentToken), _termInWhile, nullptr, nullptr));
-        _terms.push_back(_termInWhile);
-        if (_nodeTreeOperator[_nodeTreeOperator.size() - 1] -> payload != SEMICOLON){
-          if (isExist(_termInWhile, _terms)){
-            _nodeTerms[_nodeTerms.size() - 1] = _nodeTerms[_symbolPosition];
-            _terms[_terms.size() - 1] = _terms[_symbolPosition];
+        createSubTreeTable(term);
+        Variable *v = dynamic_cast<Variable *>(term);
+        if(v){
+            for(int i=0; i<(int)_subTreeTerms.size(); i++){
+                if(_subTreeTerms[i]->symbol() == term->symbol()){
+                  return _subTreeTerms[i];
+                }
+            }
+            _subTreeTerms.push_back(term);
+        }
+        return term;
+    }
+
+    void createSubTreeTable(Term *t)
+    {
+        Struct *s = dynamic_cast<Struct *>(t);
+        if(s)
+        {
+          for(int i=0; i<(int)s->arity(); i++){
+            createSubTreeTable(s->args(i));
           }
         }
-      }
-    }
-  }
-
-  bool isExist(Term * term, vector<Term*> terms){
-    for (int i = terms.size() - 2; i >= 0; i--){
-      if (_currentToken == VAR && (terms[i] -> symbol() == term -> symbol())){
-          _symbolPosition = i;
-          return true;
-      }
-      else if (_currentToken == VAR && _structPosition.size() != 0 && !_inStruct){
-        for (int j = 0; j < _structPosition.size(); j++){
-          for (int k = 0; k < dynamic_cast<Struct *>(terms[_structPosition[j]]) -> _args.size(); k++){
-            if (term -> symbol() == dynamic_cast<Struct *>(terms[_structPosition[j]]) -> _args[k] -> symbol()){
-              dynamic_cast<Struct *>(terms[_structPosition[j]]) -> _args[k] = term;
+        List *l = dynamic_cast<List *>(t);
+        if(l){
+          for(int i = 0; i < (int)l->arity(); i++){
+            createSubTreeTable(l->args(i));
+          }
+        }
+        Variable *v = dynamic_cast<Variable *>(t);
+        if(v){
+          for(int i=0; i<(int)_subTreeTerms.size(); i++){
+            if(_subTreeTerms[i]->symbol() == t->symbol()){
+              _subTreeTerms[i]->match(*t);
+                return;
             }
           }
+          _subTreeTerms.push_back(t);
         }
-      }
     }
-    return false;
-  }
 
-  void checkVar(vector<Term *> args){
-    for (int i = 0; i < _terms.size(); i++){
-      for (int j = 0; j < args.size(); j++){
-        if ((args[j] -> symbol()) == (_terms[i] -> symbol())){
-          args[j] = _terms[i];
+    Node *expressionTree() {  return _tree;  }
+
+  private:
+
+    void createTerms(){
+        Term *t = createTerm();
+        if (t != nullptr){
+            _terms.push_back(t);
+            while ((_currentToken = _scanner.nextToken()) == ','){
+              _terms.push_back(createTerm());
+            }
         }
-      }
     }
-  }
 
-    vector<Node *> _nodeTerms;
-    vector<Node *> _nodeTreeOperator;
-    int _symbolPosition;
-    bool _isStruct = false;
-    bool _inStruct = false;
-    vector<int> _structPosition;
-    vector<int> _treeOperator;
-    vector<Term *> _terms;
-    Scanner _scanner;
     int _currentToken;
-    Node * _root = nullptr;
+    Node *_tree;
+    vector<Term *> _terms;
+    vector<Term *> _subTreeTerms;
+    Scanner _scanner;
+
+
 };
 #endif

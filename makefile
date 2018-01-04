@@ -4,7 +4,7 @@ SHELL_FILE = mainShell
 
 HW_FILE = mainTest
 
-all: clean $(Name) shell
+all: $(Name) shell
 
 hw8: $(HW_FILE).o term.o struct.o list.o node.o
 

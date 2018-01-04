@@ -22,7 +22,7 @@ else
 endif
 
 $(SHELL_MAIN).o: $(SHELL_MAIN).cpp $(HEADER_FILE) $(OBJECT_FILE)
-	g++ -std=c++11 -c $(SHELL_MAIN).cpp
+	g++ -std=gnu++0x -c $(SHELL_MAIN).cpp
 
 $(NAME): $(HW_MAIN).o
 ifeq (${OS}, Windows_NT)
@@ -32,16 +32,16 @@ else
 endif
 
 $(HW_MAIN).o: $(HW_MAIN).cpp $(HEADER_FILE) $(OBJECT_FILE) $(TEST_FILE)
-	g++ -std=c++11 -c $(HW_MAIN).cpp
+	g++ -std=gnu++0x -c $(HW_MAIN).cpp
 
 term.o: term.h term.cpp iterator.h
-	g++ -std=c++11 -c term.cpp
+	g++ -std=gnu++0x -c term.cpp
 struct.o: struct.h struct.cpp iterator.h
-	g++ -std=c++11 -c struct.cpp
+	g++ -std=gnu++0x -c struct.cpp
 list.o: list.h list.cpp iterator.h
-	g++ -std=c++11 -c list.cpp
+	g++ -std=gnu++0x -c list.cpp
 node.o: node.h node.cpp
-	g++ -std=c++11 -c node.cpp
+	g++ -std=gnu++0x -c node.cpp
 
 clean:
 

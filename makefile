@@ -1,27 +1,45 @@
-INC_DIR = include
+Name = hw8
 
+SHELL_FILE = mainShell
 
-all: hw3
+HW_FILE = mainTest
 
-hw3: main.o struct.o variable.o number.o
+all: clean $(Name) shell
+
+hw8: $(HW_FILE).o term.o struct.o list.o node.o
+
+shell: $(SHELL_FILE).o term.o struct.o list.o node.o
+
 ifeq (${OS}, Windows_NT)
-	g++ -o hw3 main.o struct.o variable.o number.o -lgtest
+	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest
 else
-	g++ -o hw3 main.o struct.o variable.o number.o -lgtest -lpthread
+	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
 endif
 
-main.o: main.cpp  term.h atom.h variable.h  utStruct.h utVariable.h number.cpp  struct.cpp variable.cpp
-	g++ -std=gnu++0x -c main.cpp
-struct.o:struct.h struct.cpp
-	g++ -std=gnu++0x -c struct.cpp
-variable.o:variable.h variable.cpp
-	g++ -std=gnu++0x -c variable.cpp
-number.o:number.h number.cpp
-	g++ -std=gnu++0x -c number.cpp
+ifeq (${OS}, Windows_NT)
+	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest
+else
+	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
+endif
+
+$(HW_FILE).o: $(HW_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
+	g++ -std=c++11 -c $(HW_FILE).cpp
+
+$(SHELL_FILE).o: $(SHELL_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
+	g++ -std=c++11 -c $(SHELL_FILE).cpp
+
+term.o: term.cpp term.h iterator.h
+	g++ -std=c++11 -c term.cpp
+struct.o: struct.cpp struct.h iterator.h
+	g++ -std=c++11 -c struct.cpp
+list.o: list.cpp list.h term.h iterator.h
+	g++ -std=c++11 -c list.cpp
+node.o: node.cpp node.h term.h
+	g++ -std=c++11 -c node.cpp
 
 clean:
 ifeq (${OS}, Windows_NT)
 	del *.o *.exe
 else
-	rm -f *.o hw3
+	rm -f *.o $(Name) shell
 endif

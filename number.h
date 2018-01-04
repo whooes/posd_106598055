@@ -1,30 +1,43 @@
 #ifndef NUMBER_H
 #define NUMBER_H
 
-#include<string>
 #include "term.h"
-#include <iostream>
-#include <sstream>
 #include "variable.h"
-
+#include <string>
 using std::string;
-using std::to_string;
 
-class Number : public Term{
-
+class Number : public Term
+{
   public:
+    Number(double d)
+    {
+        string temp = std::to_string(d);
+        for (int i = temp.size() - 1; i >= 0; i--)
+        {
+            if (temp[i] == '0' || temp[i] == '.')
+                temp.pop_back();
+            else
+                break;
+        }
+        _symbol = temp;
+    }
 
-    Number(double n);
+    string symbol() const { return _symbol; }
 
-    string symbol() const;
+    bool match(Term &term)
+    {
+        if (term.getVariable())
+        {
+            return term.match(*this);
+        }
+        else
+        {
+            return value() == term.value();
+        }
+    }
 
-    bool match(Term &term);
-
-  //  bool match(Variable &var);
-
-    private:
-      string _symbol;
+  private:
+    string _symbol;
 };
-
 
 #endif

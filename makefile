@@ -1,45 +1,50 @@
-Name = hw8
+HW_FILE_NAME = mainTest
+HW_NAME = hw8
+SHELL_FILE_NAME = mainShell
+HEADER_FILE = atom.h variable.h struct.h number.h term.h \
+		      list.h scanner.h parser.h global.h node.h  \
+			  iterator.h exception.h expression.h
+OBJECT_FILE = term.o struct.o list.o node.o
+UNIT_TEST_FILE = exception.h expression.h
 
-SHELL_FILE = mainShell
 
-HW_FILE = mainTest
+all: $(HW_NAME) shell
 
-all: $(Name) shell
-
-hw8: $(HW_FILE).o term.o struct.o list.o node.o
-
-shell: $(SHELL_FILE).o term.o struct.o list.o node.o
-
-ifeq (${OS}, Windows_NT)
-	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest
+shell: $(SHELL_FILE_NAME).o
+ifeq ($(OS), Windows_NT)
+	g++ -o shell $(SHELL_FILE_NAME).o $(OBJECT_FILE) -lgtest
 else
-	g++ -o $(Name) $(HW_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
+	g++ -o shell $(SHELL_FILE_NAME).o $(OBJECT_FILE) -lgtest -lpthread
 endif
 
-ifeq (${OS}, Windows_NT)
-	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest
+$(SHELL_FILE_NAME).o: $(SHELL_FILE_NAME).cpp $(HEADER_FILE) $(OBJECT_FILE)
+	g++ -std=gnu++0x -c $(SHELL_FILE_NAME).cpp
+
+$(HW_NAME): $(HW_FILE_NAME).o
+ifeq ($(OS), Windows_NT)
+	g++ -o $(HW_NAME) $(HW_FILE_NAME).o $(OBJECT_FILE) -lgtest
 else
-	g++ -o shell $(SHELL_FILE).o term.o struct.o list.o node.o -lgtest -lpthread
+	g++ -o $(HW_NAME) $(HW_FILE_NAME).o $(OBJECT_FILE) -lgtest -lpthread
 endif
 
-$(HW_FILE).o: $(HW_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
-	g++ -std=c++11 -c $(HW_FILE).cpp
+$(HW_FILE_NAME).o: $(HW_FILE_NAME).cpp $(HEADER_FILE) $(UNIT_TEST_FILE) $(OBJECT_FILE)
+	g++ -std=gnu++0x -c $(HW_FILE_NAME).cpp
 
-$(SHELL_FILE).o: $(SHELL_FILE).cpp expression.h exception.h exp.h variable.h parser.h scanner.h global.h iterator.h number.h
-	g++ -std=c++11 -c $(SHELL_FILE).cpp
+term.o: term.h term.cpp iterator.h
+	g++ -std=gnu++0x -c term.cpp
 
-term.o: term.cpp term.h iterator.h
-	g++ -std=c++11 -c term.cpp
-struct.o: struct.cpp struct.h iterator.h
-	g++ -std=c++11 -c struct.cpp
-list.o: list.cpp list.h term.h iterator.h
-	g++ -std=c++11 -c list.cpp
-node.o: node.cpp node.h term.h
-	g++ -std=c++11 -c node.cpp
+struct.o: struct.h struct.cpp iterator.h
+	g++ -std=gnu++0x -c struct.cpp
+
+list.o: list.h list.cpp iterator.h
+	g++ -std=gnu++0x -c list.cpp
+
+node.o: node.h node.cpp
+	g++ -std=gnu++0x -c node.cpp
 
 clean:
-ifeq (${OS}, Windows_NT)
+ifeq ($(OS), Windows_NT)
 	del *.o *.exe
 else
-	rm -f *.o $(Name) shell
+	rm -f *.o $(HW_NAME) shell
 endif
